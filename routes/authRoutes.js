@@ -3,6 +3,7 @@ import * as authController from '../controllers/authController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+console.log('1');
 
 // Публичные маршруты
 router.post('/register', authController.register);
