@@ -1,12 +1,11 @@
 {
   "name": "your-project-name",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
