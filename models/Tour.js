@@ -1,61 +1,71 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+  },
+  image: {
+    type: [String],
+    required: true,
   },
   startDate: {
     type: Date,
-    required: true
+    required: true,
   },
   duration: {
     type: Number,
-    required: true // количество ночей
+    required: true, // количество ночей
   },
-  destinations: [{
-    city: {
-      type: String,
-      required: true
+  destinations: [
+    {
+      city: {
+        type: String,
+        required: true,
+      },
+      nights: {
+        type: Number,
+        required: true,
+      },
     },
-    nights: {
-      type: Number,
-      required: true
-    }
-  }],
+  ],
   price: {
     amount: {
       type: Number,
-      required: true
+      required: true,
     },
     currency: {
       type: String,
-      default: 'USD'
+      default: "USD",
     },
     perPerson: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
-  included: [{
-    type: String // например: "перелет", "трансфер", "проживание" и т.д.
-  }],
-  hotels: [{
-    name: {
-      type: String,
-      required: true
+  included: [
+    {
+      type: String, // например: "перелет", "трансфер", "проживание" и т.д.
     },
-    stars: {
-      type: Number,
-      min: 1,
-      max: 5
+  ],
+  hotels: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      stars: {
+        type: Number,
+        min: 1,
+        max: 5,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
     },
-    city: {
-      type: String,
-      required: true
-    }
-  }]
+  ],
 });
 
-export default mongoose.model('Tour', tourSchema); 
+export default mongoose.model("Tour", tourSchema);
