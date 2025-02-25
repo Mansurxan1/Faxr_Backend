@@ -8,7 +8,11 @@ import authRoutes from './routes/authRoutes.js';
 const app = express();
 
 // CORS настройка
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "http://localhost:5174",
+  "https://your-frontend-domain.vercel.app"
+];
 app.use(
   cors({
     origin: allowedOrigins,
