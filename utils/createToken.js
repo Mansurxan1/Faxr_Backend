@@ -11,6 +11,8 @@ const createToken = (res, userId) => {
     sameSite: "strict",
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
   });
+  
+  return token; // Возвращаем токен
 };
 
 export default createToken;

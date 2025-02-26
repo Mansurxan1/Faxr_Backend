@@ -8,7 +8,10 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "server": "nodemon index.js",
+    "client": "cd client && npm run start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm install && cd client && npm install && npm run build",
     "vercel-build": "echo hello"
   },
   "keywords": [],
@@ -28,6 +31,7 @@
     "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^2.0.20"
   }
 }

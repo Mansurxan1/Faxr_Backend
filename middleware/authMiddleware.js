@@ -3,7 +3,16 @@ import asyncHandler from "./asyncHandler.js";
 import User from "../models/userModel.js";
 
 export const authenticate = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.jwt;
+  let token;
+  
+  // Проверяем наличие токена в cookie
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  } 
+  // Проверяем наличие токена в заголовке Authorization
+  else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
 
   if (!token) {
     res.status(401);

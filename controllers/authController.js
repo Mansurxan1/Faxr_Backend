@@ -35,7 +35,7 @@ export const register = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    createToken(res, user._id);
+    const token = createToken(res, user._id);
     res.status(201).json({
       status: "success",
       message: "Регистрация успешна",
@@ -45,6 +45,7 @@ export const register = asyncHandler(async (req, res) => {
         role: user.role,
         isAdmin: user.isAdmin,
       },
+      token: token // Возвращаем токен клиенту
     });
   } else {
     res.status(400);
@@ -75,7 +76,8 @@ export const login = asyncHandler(async (req, res) => {
     console.log("Пароль совпадает:", isMatch ? "да" : "нет");
 
     if (isMatch) {
-      createToken(res, user._id);
+      // Создаем токен и сохраняем в cookie
+      const token = createToken(res, user._id);
 
       res.json({
         status: "success",
@@ -83,7 +85,10 @@ export const login = asyncHandler(async (req, res) => {
         user: {
           _id: user._id,
           email: user.email,
+          role: user.role,
+          isAdmin: user.isAdmin
         },
+        token: token // Возвращаем токен клиенту
       });
     } else {
       res.status(401);
