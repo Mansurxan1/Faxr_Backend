@@ -22,7 +22,11 @@ export const createBooking = asyncHandler(async (req, res) => {
     },
   });
 
-  await newBooking.populate("tour");
+  // Полное заполнение данных о туре
+  await newBooking.populate({
+    path: "tour",
+    select: "name startDate price destinations hotels image duration description included",
+  });
 
   res.status(201).json({
     status: "success",
@@ -35,30 +39,102 @@ export const getMyBookings = asyncHandler(async (req, res) => {
     "customer.email": req.user.email,
   }).populate({
     path: "tour",
-    select: "name startDate price destinations hotels",
+    select: "name startDate price destinations hotels image duration description included",
   });
+
+  // Проверяем, что все туры корректно загружены
+  const processedBookings = await Promise.all(
+    bookings.map(async (booking) => {
+      const bookingObj = booking.toObject ? booking.toObject() : booking;
+      
+      // Если тур не был найден через populate, попробуем найти его вручную
+      if (!bookingObj.tour && bookingObj._id) {
+        try {
+          // Получаем исходное бронирование из базы
+          const originalBooking = await Booking.findById(bookingObj._id);
+          if (originalBooking && originalBooking.tour) {
+            const tourId = originalBooking.tour;
+            const tourData = await Tour.findById(tourId);
+            
+            if (tourData) {
+              // Если тур найден, добавляем его данные в бронирование
+              bookingObj.tour = tourData.toObject();
+            } else {
+              // Если тур не найден, оставляем информацию о его ID
+              bookingObj.tour = { 
+                _id: tourId,
+                name: "Тур не найден",
+                info: "Подробная информация о туре недоступна"
+              };
+            }
+          }
+        } catch (error) {
+          console.error(`Ошибка при поиске тура: ${error.message}`);
+        }
+      }
+      return bookingObj;
+    })
+  );
 
   res.status(200).json({
     status: "success",
-    count: bookings.length,
-    data: bookings,
+    count: processedBookings.length,
+    data: processedBookings,
   });
 });
 
 export const getAllBookings = asyncHandler(async (req, res) => {
   const bookings = await Booking.find().populate({
     path: "tour",
-    select: "name startDate price",
+    select: "name startDate price destinations hotels image duration description included",
   });
+
+  // Проверяем, что все туры корректно загружены
+  const processedBookings = await Promise.all(
+    bookings.map(async (booking) => {
+      const bookingObj = booking.toObject ? booking.toObject() : booking;
+      
+      // Если тур не был найден через populate, попробуем найти его вручную
+      if (!bookingObj.tour && bookingObj._id) {
+        try {
+          // Получаем исходное бронирование из базы
+          const originalBooking = await Booking.findById(bookingObj._id);
+          if (originalBooking && originalBooking.tour) {
+            const tourId = originalBooking.tour;
+            const tourData = await Tour.findById(tourId);
+            
+            if (tourData) {
+              // Если тур найден, добавляем его данные в бронирование
+              bookingObj.tour = tourData.toObject();
+            } else {
+              // Если тур не найден, оставляем информацию о его ID
+              bookingObj.tour = { 
+                _id: tourId,
+                name: "Тур не найден",
+                info: "Подробная информация о туре недоступна"
+              };
+            }
+          }
+        } catch (error) {
+          console.error(`Ошибка при поиске тура: ${error.message}`);
+        }
+      }
+      return bookingObj;
+    })
+  );
 
   res.status(200).json({
     status: "success",
-    data: bookings,
+    count: processedBookings.length,
+    data: processedBookings,
   });
 });
 
 export const getBookingById = asyncHandler(async (req, res) => {
-  const booking = await Booking.findById(req.params.id).populate("tour");
+  const booking = await Booking.findById(req.params.id).populate({
+    path: "tour",
+    select: "name startDate price destinations hotels image duration description included",
+  });
 
   if (!booking) {
     res.status(404);
@@ -70,9 +146,33 @@ export const getBookingById = asyncHandler(async (req, res) => {
     throw new Error("У вас нет прав для просмотра этого бронирования");
   }
 
+  const bookingObj = booking.toObject ? booking.toObject() : booking;
+  
+  // Если тур не был найден через populate, попробуем найти его вручную
+  if (!bookingObj.tour && booking.tour) {
+    try {
+      const tourId = booking.tour;
+      const tourData = await Tour.findById(tourId);
+      
+      if (tourData) {
+        // Если тур найден, добавляем его данные в бронирование
+        bookingObj.tour = tourData.toObject();
+      } else {
+        // Если тур не найден, оставляем информацию о его ID
+        bookingObj.tour = { 
+          _id: tourId,
+          name: "Тур не найден",
+          info: "Подробная информация о туре недоступна"
+        };
+      }
+    } catch (error) {
+      console.error(`Ошибка при поиске тура: ${error.message}`);
+    }
+  }
+
   res.status(200).json({
     status: "success",
-    data: booking,
+    data: bookingObj,
   });
 });
 
@@ -97,18 +197,48 @@ export const updateBookingStatus = asyncHandler(async (req, res) => {
   }
 
   // Проверяем валидность статуса
-  const validStatuses = ['pending', 'confirmed', 'cancelled'];
+  const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
   if (!validStatuses.includes(req.body.status)) {
     res.status(400);
-    throw new Error("Недопустимый статус. Разрешены: pending, confirmed, cancelled");
+    throw new Error("Недопустимый статус. Разрешены: pending, confirmed, cancelled, completed");
   }
 
   booking.status = req.body.status;
   await booking.save();
 
+  // Получаем обновленное бронирование с данными о туре
+  const updatedBooking = await Booking.findById(req.params.id).populate({
+    path: "tour",
+    select: "name startDate price destinations hotels image duration description included",
+  });
+
+  const bookingObj = updatedBooking.toObject ? updatedBooking.toObject() : updatedBooking;
+  
+  // Если тур не был найден через populate, попробуем найти его вручную
+  if (!bookingObj.tour && updatedBooking.tour) {
+    try {
+      const tourId = updatedBooking.tour;
+      const tourData = await Tour.findById(tourId);
+      
+      if (tourData) {
+        // Если тур найден, добавляем его данные в бронирование
+        bookingObj.tour = tourData.toObject();
+      } else {
+        // Если тур не найден, оставляем информацию о его ID
+        bookingObj.tour = { 
+          _id: tourId,
+          name: "Тур не найден",
+          info: "Подробная информация о туре недоступна"
+        };
+      }
+    } catch (error) {
+      console.error(`Ошибка при поиске тура: ${error.message}`);
+    }
+  }
+
   res.status(200).json({
     status: "success",
-    data: booking,
+    data: bookingObj,
   });
 });
 

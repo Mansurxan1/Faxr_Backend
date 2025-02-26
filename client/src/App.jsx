@@ -7,6 +7,7 @@ import { store } from './app/store';
 import Navbar from './components/Layout/Navbar';
 import LoginForm from './components/Auth/LoginForm';
 import TourList from './components/Tours/TourList';
+import TourDetails from './components/Tours/TourDetails';
 import BookingForm from './components/Bookings/BookingForm';
 import BookingList from './components/Admin/BookingList';
 import TourForm from './components/Admin/TourForm';
@@ -27,6 +28,7 @@ function App() {
             <Routes>
               {/* Публичные маршруты */}
               <Route path="/" element={<TourList />} />
+              <Route path="/tours/:id" element={<TourDetails />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/register" element={<RegistrationForm />} />
               <Route path="/access-denied" element={<AccessDenied />} />

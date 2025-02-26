@@ -4,7 +4,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Получение всех бронирований (только для админа)
     getAllBookings: builder.query({
-      query: () => "/bookings",
+      query: () => "/api/bookings",
       providesTags: (result) =>
         result
           ? [
@@ -16,7 +16,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
 
     // Получение бронирований текущего пользователя
     getMyBookings: builder.query({
-      query: () => "/bookings/my-bookings",
+      query: () => "/api/bookings/my-bookings",
       providesTags: (result) =>
         result
           ? [
@@ -28,14 +28,14 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
 
     // Получение бронирования по ID
     getBookingById: builder.query({
-      query: (id) => `/bookings/${id}`,
+      query: (id) => `/api/bookings/${id}`,
       providesTags: (result, error, id) => [{ type: "Booking", id }],
     }),
 
     // Создание нового бронирования
     createBooking: builder.mutation({
       query: (booking) => ({
-        url: "/bookings",
+        url: "/api/bookings",
         method: "POST",
         body: booking,
       }),
@@ -48,7 +48,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
     // Обновление статуса бронирования (только для админа)
     updateBookingStatus: builder.mutation({
       query: ({ id, status }) => ({
-        url: `/bookings/${id}/status`,
+        url: `/api/bookings/${id}/status`,
         method: "PUT",
         body: { status },
       }),
@@ -62,7 +62,7 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
     // Удаление бронирования (только для админа)
     deleteBooking: builder.mutation({
       query: (id) => ({
-        url: `/bookings/${id}`,
+        url: `/api/bookings/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: [

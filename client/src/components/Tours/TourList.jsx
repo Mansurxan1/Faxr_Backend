@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { useGetToursQuery, useDeleteTourMutation } from "../../features/tours/toursApiSlice";
+import {
+  useGetToursQuery,
+  useDeleteTourMutation,
+} from "../../features/tours/toursApiSlice";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectIsAdmin } from "../../features/auth/authSlice";
 import AdminOnly from "../UI/AdminOnly";
 
 const TourList = () => {
-  const { data: tours, isLoading, isError, error, refetch } = useGetToursQuery();
+  const {
+    data: tours,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetToursQuery();
   const isAdmin = useSelector(selectIsAdmin);
   const [deleteTour, { isLoading: isDeleting }] = useDeleteTourMutation();
   const [deleteId, setDeleteId] = useState(null);
@@ -26,7 +35,7 @@ const TourList = () => {
       setDeleteId(null);
       refetch(); // Обновляем список туров
     } catch (err) {
-      console.error('Ошибка при удалении тура:', err);
+      console.error("Ошибка при удалении тура:", err);
     }
   };
 
@@ -74,15 +83,25 @@ const TourList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tours?.data.map((tour) => (
-            <div
+            <Link
+              to={`/tours/${tour._id}`}
               key={tour._id}
               className="bg-white rounded-lg shadow-md overflow-hidden">
-              {tour.imagePath && (
+              {tour.image && tour.image.length > 0 ? (
                 <img
-                  src={`/api/tours/${tour._id}/image`}
+                  src={tour.image[0]}
                   alt={tour.name}
                   className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://via.placeholder.com/800x600?text=Нет+изображения";
+                  }}
                 />
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                  <p className="text-gray-500">Нет изображения</p>
+                </div>
               )}
               <div className="p-4">
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">
@@ -107,9 +126,10 @@ const TourList = () => {
                     <button
                       onClick={() => handleDeleteClick(tour._id)}
                       className="text-red-500 hover:text-red-700"
-                      disabled={isDeleting && deleteId === tour._id}
-                    >
-                      {isDeleting && deleteId === tour._id ? "Удаление..." : "Удалить"}
+                      disabled={isDeleting && deleteId === tour._id}>
+                      {isDeleting && deleteId === tour._id
+                        ? "Удаление..."
+                        : "Удалить"}
                     </button>
                     <Link
                       to={`/admin/tours/${tour._id}/edit`}
@@ -119,7 +139,7 @@ const TourList = () => {
                   </div>
                 </AdminOnly>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
@@ -129,20 +149,21 @@ const TourList = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h3 className="text-xl font-bold mb-4">Подтверждение удаления</h3>
-            <p className="mb-6">Вы уверены, что хотите удалить этот тур? Это действие невозможно отменить.</p>
+            <p className="mb-6">
+              Вы уверены, что хотите удалить этот тур? Это действие невозможно
+              отменить.
+            </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={cancelDelete}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 transition"
-                disabled={isDeleting}
-              >
+                disabled={isDeleting}>
                 Отмена
               </button>
               <button
                 onClick={confirmDelete}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-md text-white transition"
-                disabled={isDeleting}
-              >
+                disabled={isDeleting}>
                 {isDeleting ? "Удаление..." : "Удалить"}
               </button>
             </div>

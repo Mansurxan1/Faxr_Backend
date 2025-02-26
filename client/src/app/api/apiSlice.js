@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { getJwtFromCookie } from '../../utils/cookieUtils';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:5001/api',
+  baseUrl: 'http://localhost:5001',
   prepareHeaders: (headers, { getState }) => {
     // Добавление JWT токена из состояния в заголовки запроса
     let token = getState().auth.token;

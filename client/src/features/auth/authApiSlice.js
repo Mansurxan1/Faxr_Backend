@@ -6,7 +6,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     // Регистрация нового пользователя
     register: builder.mutation({
       query: (credentials) => ({
-        url: '/auth/register',
+        url: '/api/auth/register',
         method: 'POST',
         body: credentials,
       }),
@@ -22,7 +22,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     // Вход пользователя
     login: builder.mutation({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: '/api/auth/login',
         method: 'POST',
         body: credentials,
       }),
@@ -38,7 +38,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     // Выход пользователя
     logout: builder.mutation({
       query: () => ({
-        url: '/auth/logout',
+        url: '/api/auth/logout',
         method: 'POST',
       }),
       // После выхода удаляем токен из localStorage
@@ -54,14 +54,14 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
     // Получение профиля пользователя
     getProfile: builder.query({
-      query: () => '/auth/profile',
+      query: () => '/api/auth/profile',
       providesTags: ['User'],
     }),
 
     // Обновление пароля пользователя
     updatePassword: builder.mutation({
       query: (passwordData) => ({
-        url: '/auth/update-password',
+        url: '/api/auth/update-password',
         method: 'PUT',
         body: passwordData,
       }),
