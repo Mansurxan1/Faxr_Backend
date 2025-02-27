@@ -6,9 +6,9 @@ export const bookingsApiSlice = apiSlice.injectEndpoints({
     getAllBookings: builder.query({
       query: () => "/api/bookings",
       providesTags: (result) =>
-        result
+        result && result.data
           ? [
-              ...result.map(({ _id }) => ({ type: "Booking", id: _id })),
+              ...result.data.map(({ _id }) => ({ type: "Booking", id: _id })),
               { type: "Booking", id: "LIST" },
             ]
           : [{ type: "Booking", id: "LIST" }],

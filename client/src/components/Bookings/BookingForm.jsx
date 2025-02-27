@@ -62,6 +62,7 @@ const BookingForm = () => {
   };
 
   // Расчет общей стоимости
+
   const totalPrice = tour.data.price.amount * participants;
 
   return (
@@ -71,10 +72,27 @@ const BookingForm = () => {
           <h2 className="text-2xl font-bold mb-4">Бронирование тура</h2>
 
           <div className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">{tour.name}</h3>
-            <p className="text-gray-600 mb-2">{tour.description}</p>
+            <h3 className="text-xl font-semibold mb-2">{tour.data.name}</h3>
+            <p className="text-gray-600 mb-2">{tour.data.description}</p>
             <p className="text-blue-600 font-bold">
-              Цена: {tour.price} ₽ за человека
+              Цена: {tour.data.price.amount} {tour.data.price.currency} за
+              человека
+            </p>
+          </div>
+
+          {/* Информация о процессе бронирования */}
+          <div className="bg-blue-50 p-4 rounded-lg mb-6">
+            <h4 className="font-semibold text-blue-800 mb-2">
+              Информация о бронировании
+            </h4>
+            <p className="text-blue-700 text-sm mb-2">
+              После оформления заявки, ваше бронирование будет отправлено на
+              рассмотрение администратору.
+            </p>
+            <p className="text-blue-700 text-sm">
+              Статус бронирования вы сможете отслеживать в разделе "Мои
+              бронирования". После подтверждения администратором, вы получите
+              уведомление.
             </p>
           </div>
 
@@ -125,7 +143,10 @@ const BookingForm = () => {
 
             <div className="mb-6 p-4 bg-gray-100 rounded-md">
               <h4 className="font-bold mb-2">Итого:</h4>
-              <p className="text-xl text-blue-600 font-bold">{totalPrice} ₽</p>
+              <p className="text-xl text-blue-600 font-bold">
+                {totalPrice}
+                {tour.data.price.currency}
+              </p>
             </div>
 
             <div className="flex justify-between">

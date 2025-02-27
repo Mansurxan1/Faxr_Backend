@@ -8,12 +8,18 @@ const ADMIN_CODE = "12345";
 
 // Регистрация (создание первого пользователя)
 export const register = asyncHandler(async (req, res) => {
-  const { email, password, adminSecret } = req.body;
+  const { email, password, name, phone, adminSecret } = req.body;
 
   // Валидация email
   if (!validateEmail(email)) {
     res.status(400);
     throw new Error("Неверный формат email");
+  }
+
+  // Проверка наличия обязательных полей
+  if (!name || !phone) {
+    res.status(400);
+    throw new Error("Имя и номер телефона обязательны для заполнения");
   }
 
   // Проверяем, не занят ли email
@@ -29,6 +35,8 @@ export const register = asyncHandler(async (req, res) => {
   // Создаем пользователя
   const user = await User.create({
     email,
+    name,
+    phone,
     password,
     role: isAdmin ? "admin" : "user",
     isAdmin: isAdmin,
@@ -42,6 +50,8 @@ export const register = asyncHandler(async (req, res) => {
       user: {
         _id: user._id,
         email: user.email,
+        name: user.name,
+        phone: user.phone,
         role: user.role,
         isAdmin: user.isAdmin,
       },
@@ -123,6 +133,8 @@ export const getProfile = asyncHandler(async (req, res) => {
       user: {
         _id: user._id,
         email: user.email,
+        name: user.name,
+        phone: user.phone,
         role: user.role,
         isAdmin: user.isAdmin,
       },

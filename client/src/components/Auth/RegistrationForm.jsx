@@ -7,6 +7,7 @@ import { setCredentials } from "../../features/auth/authSlice";
 const RegistrationForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [adminSecret, setAdminSecret] = useState("");
@@ -20,7 +21,7 @@ const RegistrationForm = () => {
 
   useEffect(() => {
     setErrMsg("");
-  }, [name, email, password, passwordConfirm, adminSecret]);
+  }, [name, email, phone, password, passwordConfirm, adminSecret]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,7 +36,8 @@ const RegistrationForm = () => {
       // Добавляем adminSecret в запрос, только если поле заполнено
       const userData = await register({ 
         name, 
-        email, 
+        email,
+        phone,
         password,
         ...(adminSecret ? { adminSecret } : {})
       }).unwrap();
@@ -46,6 +48,7 @@ const RegistrationForm = () => {
       // Очищаем форму
       setName("");
       setEmail("");
+      setPhone("");
       setPassword("");
       setPasswordConfirm("");
       setAdminSecret("");
@@ -104,6 +107,21 @@ const RegistrationForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="phone" className="block text-gray-700 font-bold mb-2">
+            Номер телефона
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            placeholder="+7 (XXX) XXX-XX-XX"
             required
           />
         </div>

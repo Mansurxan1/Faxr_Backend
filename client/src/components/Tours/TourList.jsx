@@ -83,21 +83,26 @@ const TourList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tours?.data.map((tour) => (
-            <Link
-              to={`/tours/${tour._id}`}
+            <div
               key={tour._id}
               className="bg-white rounded-lg shadow-md overflow-hidden">
               {tour.image && tour.image.length > 0 ? (
-                <img
-                  src={tour.image[0]}
-                  alt={tour.name}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://via.placeholder.com/800x600?text=Нет+изображения";
-                  }}
-                />
+                <Link
+                  Link
+                  to={`/tours/${tour._id}`}
+                  key={tour._id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <img
+                    src={tour.image[0]}
+                    alt={tour.name}
+                    className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src =
+                        "https://via.placeholder.com/800x600?text=Нет+изображения";
+                    }}
+                  />
+                </Link>
               ) : (
                 <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                   <p className="text-gray-500">Нет изображения</p>
@@ -139,7 +144,7 @@ const TourList = () => {
                   </div>
                 </AdminOnly>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

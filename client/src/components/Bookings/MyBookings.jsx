@@ -135,6 +135,8 @@ const MyBookings = () => {
   // Получаем список бронирований из данных
   const bookings = bookingsData?.data || [];
 
+  console.log(bookings);
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Мои бронирования</h1>
@@ -157,10 +159,10 @@ const MyBookings = () => {
               
               {/* Заголовок с изображением */}
               <div className="relative">
-                {booking.tour && getTourImage(booking.tour) ? (
+                {booking.tour && booking.tour.image && booking.tour.image.length > 0 ? (
                   <div className="w-full h-48 overflow-hidden">
                     <img 
-                      src={getTourImage(booking.tour)} 
+                      src={booking.tour.image[0]} 
                       alt={booking.tour.name || "Изображение тура"} 
                       className="w-full h-full object-cover"
                       onError={handleImageError}
@@ -249,107 +251,132 @@ const MyBookings = () => {
                       </p>
                     </div>
                   </div>
-
+                  
                   <div>
-                    <h4 className="font-semibold text-gray-700 mb-2">Данные клиента</h4>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-gray-700 mb-1">
-                        <span className="font-semibold">Имя:</span>{" "}
-                        {booking.customer?.name || "Не указано"}
-                      </p>
-                      <p className="text-gray-700 mb-1">
-                        <span className="font-semibold">Email:</span>{" "}
-                        {booking.customer?.email || "Не указано"}
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-semibold">Телефон:</span>{" "}
-                        {booking.customer?.phone || "Не указано"}
+                    <h4 className="font-semibold text-gray-700 mb-2">Статус бронирования</h4>
+                    <div className={`p-3 rounded-lg border ${getStatusClass(booking.status)}`}>
+                      <div className="flex items-center mb-2">
+                        <span className="text-lg font-bold">{getStatusName(booking.status)}</span>
+                      </div>
+                      
+                      {booking.status === 'pending' && (
+                        <p className="text-sm">
+                          Ваше бронирование ожидает подтверждения администратором. 
+                          Мы свяжемся с вами в ближайшее время.
+                        </p>
+                      )}
+                      
+                      {booking.status === 'confirmed' && (
+                        <p className="text-sm">
+                          Ваше бронирование подтверждено! Вы можете готовиться к поездке.
+                          Детали будут отправлены на ваш email.
+                        </p>
+                      )}
+                      
+                      {booking.status === 'completed' && (
+                        <p className="text-sm">
+                          Поездка завершена. Спасибо, что выбрали нас! 
+                          Будем рады видеть вас снова.
+                        </p>
+                      )}
+                      
+                      {booking.status === 'cancelled' && (
+                        <p className="text-sm">
+                          Бронирование отменено. Если у вас есть вопросы, 
+                          пожалуйста, свяжитесь с нами.
+                        </p>
+                      )}
+                      
+                      <p className="text-xs text-gray-600 mt-2">
+                        Дата создания: {formatDate(booking.createdAt)}
                       </p>
                     </div>
                   </div>
                 </div>
 
+                {/* Дополнительная информация о туре */}
                 {booking.tour && (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      {booking.tour.destinations && booking.tour.destinations.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Направления</h4>
-                          <div className="bg-gray-50 p-3 rounded-lg">
+                  <div className="mt-4">
+                    <div className="border-t border-gray-200 pt-4">
+                      <h4 className="font-semibold text-gray-700 mb-2">Детали тура</h4>
+                      
+                      {booking.tour && booking.tour.destinations && booking.tour.destinations.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-sm font-semibold text-gray-600">Направления:</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
                             {booking.tour.destinations.map((destination, index) => (
-                              <div key={destination._id || index} className="mb-2 last:mb-0">
-                                <p className="text-gray-700">
-                                  <span className="font-semibold">{destination.city}:</span>{" "}
-                                  {destination.nights} {destination.nights === 1 ? "ночь" : 
-                                    destination.nights > 1 && destination.nights < 5 ? "ночи" : "ночей"}
-                                </p>
-                              </div>
+                              <span 
+                                key={index} 
+                                className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs"
+                              >
+                                {destination.city} ({destination.nights} {destination.nights === 1 ? 'ночь' : 
+                                  (destination.nights >= 2 && destination.nights <= 4) ? 'ночи' : 'ночей'})
+                              </span>
                             ))}
                           </div>
                         </div>
                       )}
-
-                      {booking.tour.hotels && booking.tour.hotels.length > 0 && (
-                        <div>
-                          <h4 className="font-semibold text-gray-700 mb-2">Отели</h4>
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            {booking.tour.hotels.map((hotel, index) => (
-                              <div key={hotel._id || index} className="mb-2 last:mb-0">
-                                <p className="text-gray-700">
-                                  <span className="font-semibold">{hotel.name}</span>{" "}
-                                  {"★".repeat(hotel.stars)}
-                                </p>
-                                <p className="text-gray-600 text-sm">{hotel.city}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {booking.tour.included && booking.tour.included.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="font-semibold text-gray-700 mb-2">Включено в стоимость</h4>
-                        <div className="bg-gray-50 p-3 rounded-lg">
-                          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                      
+                      {booking.tour && booking.tour.included && booking.tour.included.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-sm font-semibold text-gray-600">Включено в стоимость:</p>
+                          <ul className="list-disc list-inside text-sm text-gray-700 mt-1">
                             {booking.tour.included.map((item, index) => (
-                              <li key={index} className="text-gray-700 flex items-center">
-                                <span className="text-green-500 mr-2">✓</span> {item}
+                              <li key={index}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {booking.tour && booking.tour.hotels && booking.tour.hotels.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-sm font-semibold text-gray-600">Отели:</p>
+                          <ul className="list-disc list-inside text-sm text-gray-700 mt-1">
+                            {booking.tour.hotels.map((hotel, index) => (
+                              <li key={index}>
+                                {hotel.name} {hotel.stars && '⭐'.repeat(hotel.stars)} 
+                                {hotel.city && ` (${hotel.city})`}
                               </li>
                             ))}
                           </ul>
                         </div>
-                      </div>
-                    )}
-                  </>
+                      )}
+                    </div>
+                  </div>
                 )}
-
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-blue-50 p-3 rounded-lg">
-                  <div className="mb-2 sm:mb-0">
-                    <p className="text-gray-600 text-sm">
-                      <span className="font-semibold">Дата бронирования:</span>{" "}
-                      {formatDate(booking.createdAt)}
-                    </p>
-                  </div>
-                  <div className="text-lg font-bold text-blue-700">
-                    Итого: {formatPrice(booking.totalPrice)}
-                  </div>
-                </div>
                 
                 {/* Кнопки действий */}
-                <div className="mt-4 flex justify-end gap-2">
-                  {booking.tour && booking.tour._id && (
-                    <Link
-                      to={`/tours/${booking.tour._id}`}
-                      className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm transition">
-                      Подробнее о туре
-                    </Link>
+                <div className="mt-4 flex justify-end">
+                  {booking.status === 'pending' && (
+                    <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md w-full text-center">
+                      <p className="text-yellow-800 text-sm">
+                        Ожидайте подтверждения бронирования от администратора
+                      </p>
+                    </div>
                   )}
-                  {booking.status === "pending" && (
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md text-sm transition">
-                      Отменить
-                    </button>
+                  
+                  {booking.status === 'confirmed' && (
+                    <div className="bg-green-50 border border-green-200 p-3 rounded-md w-full text-center">
+                      <p className="text-green-800 text-sm">
+                        Ваше бронирование подтверждено! Готовьтесь к поездке
+                      </p>
+                    </div>
+                  )}
+                  
+                  {booking.status === 'completed' && (
+                    <div className="bg-blue-50 border border-blue-200 p-3 rounded-md w-full text-center">
+                      <p className="text-blue-800 text-sm">
+                        Поездка завершена. Спасибо за выбор нашей компании!
+                      </p>
+                    </div>
+                  )}
+                  
+                  {booking.status === 'cancelled' && (
+                    <div className="bg-red-50 border border-red-200 p-3 rounded-md w-full text-center">
+                      <p className="text-red-800 text-sm">
+                        Бронирование отменено
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>

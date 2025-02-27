@@ -13,6 +13,7 @@ import BookingList from './components/Admin/BookingList';
 import TourForm from './components/Admin/TourForm';
 import MyBookings from './components/Bookings/MyBookings';
 import RegistrationForm from './components/Auth/RegistrationForm';
+import UserProfile from './components/Auth/UserProfile';
 import AutoLogin from './components/Auth/AutoLogin';
 import AdminRoute from './components/Routes/AdminRoute';
 import AccessDenied from './components/UI/AccessDenied';
@@ -36,6 +37,7 @@ function App() {
               {/* Маршруты для авторизованных пользователей */}
               <Route path="/tours/:id/book" element={<BookingForm />} />
               <Route path="/bookings/my-bookings" element={<MyBookings />} />
+              <Route path="/profile" element={<UserProfile />} />
               
               {/* Маршруты для администраторов - защищенные с помощью AdminRoute */}
               <Route element={<AdminRoute />}>
