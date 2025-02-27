@@ -12,7 +12,7 @@ const allowedOrigins = [
   "http://localhost:5173", 
   "http://localhost:5174",
   "http://localhost:3000",
-  "https://your-frontend-domain.vercel.app"
+  "https://www.faxr-travel.uz"
 ];
 app.use(
   cors({
